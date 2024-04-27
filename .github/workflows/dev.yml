@@ -56,4 +56,4 @@ jobs:
         run: sfdx force:source:deploy  -c -w 1 -p NEWP/force-app/main/default -u HubOrg
       
       - name: Deploy changes
-        run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json --checkonly
+        run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json 
