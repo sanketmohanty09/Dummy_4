@@ -1,0 +1,31 @@
+name: Salesforce Validation on Feature Branch
+
+on:
+  create:
+    branches:
+      - 'feature*'
+
+jobs:
+  validate_against_dev_org:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Salesforce CLI
+        uses: sfdx/actions/setup-salesforce@v1
+        with:
+          version: 'latest'
+
+      - name: Authenticate with Dev Org
+        run: sfdx force:auth:jwt:grant --clientid ${{ secrets.SF_CLIENT_ID }} --jwtkeyfile ${{ secrets.SF_JWT_KEY_FILE }} --username ${{ secrets.SF_USERNAME_DEV }} --setdefaultdevhubusername -a DevOrg
+
+      - name: Validate Commits
+        run: |
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '.cls\|.trigger\|.apex\|.xml' | xargs sfdx force:source:push --targetusername DevOrg --checkonly
+
+      - name: Run Apex Tests
+        run: sfdx force:apex:test:run --wait 10 --resultformat human --outputdir test-results --targetusername DevOrg
+
+      - name: Clean up
+        run: sfdx force:auth:logout --targetusername DevOrg
