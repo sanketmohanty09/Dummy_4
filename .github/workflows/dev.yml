@@ -51,9 +51,14 @@ jobs:
           echo "--- package.xml generated with added and modified metadata ---"
           cat delta/package/package.xml
       
-      # Deploy changes
+      # Validate changes
       - name: Validate Changes 
         run: sfdx force:source:deploy  -c -w 1 -p NEWP/force-app/main/default -u HubOrg
+
+        # Run apex class 
+      - name: Apex test class
+        run: sfdx force:apex:test:run -c -r human --wait 10 --targetusername HubOrg
       
+      # Deploy changes
       - name: Deploy changes
         run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json 
