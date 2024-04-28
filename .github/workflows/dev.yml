@@ -61,4 +61,5 @@ jobs:
       
       # Deploy changes
       - name: Deploy changes
-        run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json 
+        run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json
+        
