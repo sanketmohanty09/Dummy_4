@@ -57,7 +57,7 @@ jobs:
 
         # Run apex class 
       - name: Apex test class
-        run: sfdx force:apex:test:run -c -r human --wait 10 --targetusername HubOrg
+        run: sfdx force:apex:test:run -l RunLocalTests -r human --wait 10 --targetusername HubOrg
       
       # Deploy changes
       - name: Deploy changes
