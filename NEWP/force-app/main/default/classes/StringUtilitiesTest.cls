@@ -4,19 +4,19 @@ private class StringUtilitiesTest {
     static void testIsPalindrome() {
         // Test a palindrome string
         String palindrome = 'level';
-        System.assertTrue(StringUtilities.isPalindrome(palindrome), 'Expected true for palindrome string');
+        System.assertEquals(true, StringUtilities.isPalindrome(palindrome), 'Expected true for palindrome string');
         
         // Test a non-palindrome string
         String nonPalindrome = 'hello';
-        System.assertFalse(StringUtilities.isPalindrome(nonPalindrome), 'Expected false for non-palindrome string');
+        System.assertEquals(false, StringUtilities.isPalindrome(nonPalindrome), 'Expected false for non-palindrome string');
         
         // Test an empty string
         String emptyString = '';
-        System.assertTrue(StringUtilities.isPalindrome(emptyString), 'Expected true for empty string');
+        System.assertEquals(true, StringUtilities.isPalindrome(emptyString), 'Expected true for empty string');
         
         // Test a single character string
         String singleChar = 'a';
-        System.assertTrue(StringUtilities.isPalindrome(singleChar), 'Expected true for single character string');
+        System.assertEquals(true, StringUtilities.isPalindrome(singleChar), 'Expected true for single character string');
     }
     
     @isTest
