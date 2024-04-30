@@ -80,7 +80,7 @@ jobs:
       # Generation of package.xml
       - name: Generate the package.xml for delta files
         run:  |
-          mkdir delta
+          mkdir changed-sources
           sfdx sgd source delta --to "HEAD" --from "origin/dev" --output "changed-sources/" --ignore-whitespace -d -i .sgdignore
           echo "--- package.xml generated with added and modified metadata ---"
           cat delta/package/package.xml
