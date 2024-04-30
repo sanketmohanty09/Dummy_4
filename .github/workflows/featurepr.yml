@@ -83,7 +83,7 @@ jobs:
           mkdir changed-sources
           sfdx sgd source delta --to "HEAD" --from "origin/dev" --output "changed-sources/" --ignore-whitespace -d -i .sgdignore
           echo "--- package.xml generated with added and modified metadata ---"
-          cat delta/package/package.xml
+          cat changed-sources/package/package.xml
       
       #The output of the scan is stored in a file called apexScanResults.sarif
       # The .sarif file can later be uploaded to github, so that we can see the 
