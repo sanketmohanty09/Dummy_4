@@ -98,7 +98,7 @@ jobs:
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
         with:
-            sarif_file: delta/apexScanResults.sarif
+            sarif_file: changed-sources/apexScanResults.sarif
 
 
         # Run apex class 
