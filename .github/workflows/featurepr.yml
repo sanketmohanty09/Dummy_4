@@ -80,17 +80,17 @@ jobs:
       # Generation of package.xml
       - name: Generate the package.xml for delta files
         run:  |
-          mkdir delta
-          sfdx sgd source delta --to "HEAD" --from "origin/dev" --output "delta/" --ignore-whitespace -d -i .sgdignore
+          mkdir changed-sources
+          sfdx sgd source delta --to "HEAD" --from "origin/dev" --output "changed-sources/" --ignore-whitespace -d -i .sgdignore
           echo "--- package.xml generated with added and modified metadata ---"
-          cat delta/package/package.xml
+          cat changed-sources/package/package.xml
       
       #The output of the scan is stored in a file called apexScanResults.sarif
       # The .sarif file can later be uploaded to github, so that we can see the 
       # results of the scan directly from the PR.
       - name: 'Scan code'
         run: |
-            cd delta
+            cd changed-sources
             sfdx scanner:run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
       
       # Now we upload the .sarif file as explained in the previous step
