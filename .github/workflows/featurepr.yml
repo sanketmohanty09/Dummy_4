@@ -1,0 +1,66 @@
+name: Salesforce Validation on Feature Branch
+on: 
+    pull_request:
+        branches:
+            - dev
+        types:
+            - opened
+
+jobs: 
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the Source code from the latest commit
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      # Download Salesforce CLI
+      - name: Download Salesforce CLI
+        run: |
+          wget -qO sfdx.tar.xz https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          mkdir sfdx
+          tar xJf sfdx.tar.xz -C sfdx --strip-components 1
+          sudo mv sfdx /usr/local/lib/
+          sudo ln -s /usr/local/lib/sfdx/bin/sfdx /usr/local/bin/sfdx
+        
+      # Ensure sfdx is added to PATH
+      - name: Add Salesforce CLI to PATH
+        run: echo 'export PATH=$PATH:/usr/local/bin/sfdx/bin' >> $HOME/.bashrc && source $HOME/.bashrc
+      
+      - name: Install the sfdx-git-delta plugin
+        run: echo 'y' | sfdx plugins:install sfdx-git-delta
+      # Create server key file
+      - name: Create server key file
+        run: |
+          touch server.key
+          echo -e "${{ secrets.SF_CICD_SERVERKEY_DEV }}" >> server_dev.key  
+        
+  
+      
+      # Authorization with DevHub
+      - name: Authorize DevHub
+        run:  sfdx force:auth:jwt:grant --clientid "${{ secrets.SF_CLIENT_ID_DEV }}" --username "${{ secrets.SF_CICD_USERNAME_DEV }}" --jwtkeyfile server_dev.key --set-default --alias HubOrg --instanceurl https://login.salesforce.com
+        # Authorization with DevHub
+
+      # Generation of package.xml
+      - name: Generate the package.xml for delta files
+        run:  |
+          mkdir delta
+          sfdx sgd source delta --to "HEAD" --from "origin/dev" --output "./delta" --ignore-whitespace -d -i .sgdignore
+          echo "--- package.xml generated with added and modified metadata ---"
+          cat delta/package/package.xml
+      
+      # Validate changes
+      - name: Validate Changes 
+        run: sfdx force:source:deploy  -c -w 1 -p NEWP/force-app/main/default -u HubOrg
+
+        # Run apex class 
+      - name: Apex test class
+        run: sfdx force:apex:test:run -l RunLocalTests -r human --wait 10 --targetusername HubOrg
+      
+      # Validate Deploy changes
+      - name: Validate Deployed changes
+        run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json --checkonly
+        
