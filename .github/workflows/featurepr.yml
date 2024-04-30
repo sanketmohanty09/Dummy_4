@@ -5,8 +5,8 @@ on:
         branches:
             - dev
         types: [opened, synchronize]
-        paths:
-            - 'NEWP/force-app/**'
+        ##paths:
+          ##  - 'NEWP/force-app/**'
 
 jobs: 
 
@@ -98,10 +98,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
             sarif_file: changed-sources/apexScanResults.sarif
-        
-        
-        
-       
+
 
         # Run apex class 
       - name: Apex test class
