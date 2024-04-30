@@ -5,6 +5,8 @@ on:
             - dev
         types:
             - opened
+        paths:
+            - 'NEWP/force-app/**'
 
 jobs: 
 
