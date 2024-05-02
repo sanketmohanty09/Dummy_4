@@ -11,7 +11,7 @@ on:
 
 jobs: 
 
-  validate-deployment-on-dev-org:
+  Deployment-on-dev-org:
     runs-on: ubuntu-latest
     steps:
       # Checkout the Source code from the latest commit
