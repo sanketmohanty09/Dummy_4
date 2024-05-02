@@ -1,0 +1,70 @@
+ name: Scheduled Workflow
+
+on: 
+  pull_request:
+  schedule:
+    - cron: ${{ secrets.SCHEDULE_CRON }}
+
+workflow_run:
+  workflows:
+    - featurepr.yml
+  types:
+    - completed
+
+jobs: 
+  validate-deployment-on-dev-org:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Download Salesforce CLI
+        run: |
+          wget -qO sfdx.tar.xz https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz
+          mkdir sfdx
+          tar xJf sfdx.tar.xz -C sfdx --strip-components 1
+          sudo mv sfdx /usr/local/lib/
+          sudo ln -s /usr/local/lib/sfdx/bin/sfdx /usr/local/bin/sfdx
+      
+      - name: Add Salesforce CLI to PATH
+        run: echo 'export PATH=$PATH:/usr/local/bin/sfdx/bin' >> $HOME/.bashrc && source $HOME/.bashrc
+            
+      - name: Install sfdx-git-delta Plugin
+        run: echo 'y' | sfdx plugins:install sfdx-git-delta
+
+      - name: Install SFDX Scanner
+        run: echo 'y' | sfdx plugins:install @salesforce/sfdx-scanner
+      
+      - name: Create Server Key File
+        run: |
+          touch server.key
+          echo -e "${{ secrets.SF_CICD_SERVERKEY_DEV }}" >> server.key
+
+      - name: Authorize DevHub
+        run: |
+          sfdx force:auth:jwt:grant --clientid "${{ secrets.SF_CLIENT_ID_DEV }}" --username "${{ secrets.SF_CICD_USERNAME_DEV }}" --jwtkeyfile server.key --set-default --alias HubOrg --instanceurl https://login.salesforce.com
+      
+      - name: Generate package.xml for Delta Files
+        run: |
+          mkdir changed-sources
+          sfdx sgd source delta --to "HEAD" --from "origin/dev" --output "changed-sources/" --ignore-whitespace -d -i .sgdignore
+          echo "--- package.xml generated with added and modified metadata ---"
+          cat changed-sources/package/package.xml
+      
+      - name: Scan Code
+        run: |
+          cd changed-sources
+          sfdx scanner:run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
+      
+      - name: Upload SARIF File
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: changed-sources/apexScanResults.sarif
+
+      - name: Run Apex Tests
+        run: sfdx force:apex:test:run -l RunLocalTests -r human --wait 10 --targetusername HubOrg
+
+      - name: Deploy Changes
+        run: sfdx force:source:deploy -p NEWP/force-app/main/default -u ${{ secrets.SF_CICD_USERNAME_DEV }} --json
