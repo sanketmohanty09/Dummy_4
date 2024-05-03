@@ -28,4 +28,5 @@ jobs:
         run: sfdx force:apex:test:run --wait 10 --resultformat human --outputdir test-results --targetusername DevOrg
 
       - name: Clean up
+
         run: sfdx force:auth:logout --targetusername DevOrg
