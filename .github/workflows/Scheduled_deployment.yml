@@ -1,8 +1,9 @@
 name: Scheduled Workflow
 
 on: 
-  pull_request:
-  schedule:
+  pull_request: 
+   branches : [ dev ]
+  schedule: 
     - cron: "10 12 3 5 *"
 
   workflow_run:
