@@ -5,7 +5,7 @@ on:
    branches:
        - dev
   schedule: 
-    - cron: "28 15 * * *"
+    - cron: "0 10 * * *"
     
 jobs: 
   deployment-on-dev-org:
