@@ -1,10 +1,8 @@
 name: Scheduled Workflow
 
 on: 
-  pull_request: 
-   branches : [ dev ]
   schedule: 
-    - cron: "15 2 3 5 *"
+    - cron: "40 2 3 5 *"
     
 jobs: 
   deployment-on-dev-org:
