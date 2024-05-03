@@ -3,7 +3,7 @@ name: Scheduled Workflow
 on: 
   pull_request:
   schedule:
-    - cron: "45 11 3 5 *"
+    - cron: "10 12 3 5 *"
 
   workflow_run:
     workflows:
