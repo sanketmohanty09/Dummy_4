@@ -4,13 +4,7 @@ on:
   pull_request: 
    branches : [ dev ]
   schedule: 
-    - cron: "30 12 3 5 *"
-
-  workflow_run:
-    workflows:
-      - featurepr.yml
-    types:
-      - completed
+    - cron: "45 12 3 5 *"
     
 jobs: 
   deployment-on-dev-org:
