@@ -1,16 +1,16 @@
- name: Scheduled Workflow
+name: Scheduled Workflow
 
 on: 
   pull_request:
   schedule:
     - cron: ${{ secrets.SCHEDULE_CRON }}
 
-workflow_run:
-  workflows:
-    - featurepr.yml
-  types:
-    - completed
-
+  workflow_run:
+    workflows:
+      - featurepr.yml
+    types:
+      - completed
+    
 jobs: 
   deployment-on-dev-org:
     runs-on: ubuntu-latest
